@@ -4,27 +4,24 @@ import {
   Filter,
   FilterExcludingWhere,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  patch,
-  put,
-  del,
-  requestBody,
-  response,
+  del, get,
+  getModelSchemaRef, param, patch, post, put, requestBody,
+  response
 } from '@loopback/rest';
 import {MensajeEmpleado} from '../models';
-import {MensajeEmpleadoRepository} from '../repositories';
+import {EmpleadoRepository, MensajeEmpleadoRepository} from '../repositories';
 
 export class MensajeEmpleadoController {
   constructor(
     @repository(MensajeEmpleadoRepository)
-    public mensajeEmpleadoRepository : MensajeEmpleadoRepository,
-  ) {}
+    public mensajeEmpleadoRepository: MensajeEmpleadoRepository,
+    @repository(EmpleadoRepository)
+    public empleadoRepository: EmpleadoRepository,
+
+  ) { }
 
   @post('/mensaje-empleados')
   @response(200, {
@@ -44,6 +41,25 @@ export class MensajeEmpleadoController {
     })
     mensajeEmpleado: Omit<MensajeEmpleado, 'id'>,
   ): Promise<MensajeEmpleado> {
+    //const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    //const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const accountSid = 'AC8487760c46e7e0cef31293983a196562';
+    const authToken = '28cdb44eb966523375efc73d13d03243';
+    console.log("ACCOUNT " + accountSid);
+    console.log("token " + authToken);
+    const client = require('twilio')(accountSid, authToken);
+
+    let _empleado = await this.empleadoRepository.findById(mensajeEmpleado.empleadoId);
+    let telefono = _empleado.telefono;
+    console.log(_empleado + " empleado");
+    console.log(telefono + " telefono");
+    client.messages
+      .create({
+
+        body: mensajeEmpleado.mensaje,
+        from: '+13099555530',
+        to: '+57' + telefono
+      })
     return this.mensajeEmpleadoRepository.create(mensajeEmpleado);
   }
 
@@ -73,6 +89,7 @@ export class MensajeEmpleadoController {
   async find(
     @param.filter(MensajeEmpleado) filter?: Filter<MensajeEmpleado>,
   ): Promise<MensajeEmpleado[]> {
+
     return this.mensajeEmpleadoRepository.find(filter);
   }
 
