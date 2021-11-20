@@ -6,3 +6,7 @@ export * from './stock-album.controller';
 export * from './artista.controller';
 export * from './album.controller';
 export * from './stock.controller';
+export * from './empleado-mensaje-empleado.controller';
+export * from './mensaje-empleado-empleado.controller';
+export * from './empleado.controller';
+export * from './mensaje-empleado.controller';
