@@ -43,8 +43,8 @@ export class MensajeEmpleadoController {
   ): Promise<MensajeEmpleado> {
     //const accountSid = process.env.TWILIO_ACCOUNT_SID;
     //const authToken = process.env.TWILIO_AUTH_TOKEN;
-    const accountSid = 'AC8487760c46e7e0cef31293983a196562';
-    const authToken = '28cdb44eb966523375efc73d13d03243';
+    const accountSid = 'AC8487760c46e7e0cef31293983a196562';  //process.env.ACCOUNT_SID
+    const authToken = 'dfebcd9f7b87970523395b118f4b97ca';
     console.log("ACCOUNT " + accountSid);
     console.log("token " + authToken);
     const client = require('twilio')(accountSid, authToken);

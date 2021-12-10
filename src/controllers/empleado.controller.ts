@@ -1,30 +1,28 @@
+import {service} from '@loopback/core';
 import {
   Count,
   CountSchema,
   Filter,
   FilterExcludingWhere,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  patch,
-  put,
-  del,
-  requestBody,
-  response,
+  del, get,
+  getModelSchemaRef, HttpErrors, param, patch, post, put, requestBody,
+  response
 } from '@loopback/rest';
-import {Empleado} from '../models';
+import {Credenciales, Empleado} from '../models';
 import {EmpleadoRepository} from '../repositories';
+import {AutenticacionService} from '../services';
 
 export class EmpleadoController {
   constructor(
     @repository(EmpleadoRepository)
-    public empleadoRepository : EmpleadoRepository,
-  ) {}
+    public empleadoRepository: EmpleadoRepository,
+    @service(AutenticacionService)
+    public servicioAutenticacion: AutenticacionService,
+  ) { }
 
   @post('/empleados')
   @response(200, {
@@ -45,6 +43,32 @@ export class EmpleadoController {
     empleado: Omit<Empleado, 'id'>,
   ): Promise<Empleado> {
     return this.empleadoRepository.create(empleado);
+  }
+
+  @post("/identificarEmpleado", {
+    responses: {
+      '200': {
+        description: "Identificacion Usuarios"
+      }
+    }
+  })
+  async identificarEmpleado(
+    @requestBody() credenciales: Credenciales
+  ) {
+    let p = await this.servicioAutenticacion.IdentificarEmpleado(credenciales.usuario, credenciales.clave);
+    if (p) {
+      let token = this.servicioAutenticacion.GenerarTokenJWT(p);
+      return {
+        datos: {
+          nombre: p.nombre,
+          correo: p.correo,
+          id: p.id,
+        },
+        tk: token
+      }
+    } else {
+      throw new HttpErrors[401]("Datos inválidos");
+    }
   }
 
   @get('/empleados/count')
