@@ -1,31 +1,28 @@
+import {authenticate} from '@loopback/authentication';
 import {
   Count,
   CountSchema,
   Filter,
   FilterExcludingWhere,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  patch,
-  put,
-  del,
-  requestBody,
-  response,
+  del, get,
+  getModelSchemaRef, param, patch, post, put, requestBody,
+  response
 } from '@loopback/rest';
 import {Album} from '../models';
 import {AlbumRepository} from '../repositories';
 
+authenticate("admin")
 export class AlbumController {
   constructor(
     @repository(AlbumRepository)
-    public albumRepository : AlbumRepository,
-  ) {}
+    public albumRepository: AlbumRepository,
+  ) { }
 
+  @authenticate("admin")
   @post('/albums')
   @response(200, {
     description: 'Album model instance',
@@ -47,6 +44,7 @@ export class AlbumController {
     return this.albumRepository.create(album);
   }
 
+  @authenticate.skip()
   @get('/albums/count')
   @response(200, {
     description: 'Album model count',
